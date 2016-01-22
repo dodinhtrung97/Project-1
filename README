@@ -1,0 +1,8 @@
+This code so far runs on a filename and a url input
+Create a text file wherein stores the html of the website
+Resuming download in case of disconnection or intentional stop is supported
+
+This text file is stored inside the same folder that stores the srget bash script
+
+To run:
+	sh srget #filename #url
