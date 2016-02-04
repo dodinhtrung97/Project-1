@@ -8,8 +8,3 @@ else
 	javac *.java
 	java main $1 $2
 fi
-if [ -f newheader.txt ]
-	rm newheader.txt
-then
-rm header.txt
-fi
