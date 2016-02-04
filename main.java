@@ -1,15 +1,33 @@
 import java.io.*;
-import java.net.Socket;
-import java.net.URL;
+import java.util.Scanner;
 
 public class main {
     public static void main(String[] args) throws IOException {
-            String filename = "cat.txt";
-            String url = "http://stackoverflow.com/questions/8654141/convert-byte-to-string-in-java";
+            String filename = args[0];
+            String url = args[1];
 
             Miscellanous mis = new Miscellanous();
             extractAll extract = new extractAll();
             socketConnect sk = new socketConnect();
+            Scanner scanner = new Scanner(System.in);
+
+            if (new File(filename).exists()){
+                    System.err.println("This file already exist, would you like to rename (y/n)");
+                    String input = scanner.nextLine();
+                    if (input.toLowerCase().equals("y")){
+                        System.err.println("Please enter a new file name with file type extension");
+                        String newName = scanner.nextLine();
+                        filename = newName;
+                    } else {
+                        System.err.println("Would you like to delete the old file (y/n)");
+                        String answer = scanner.nextLine();
+                        if (answer.toLowerCase().equals("y")){
+                            File oldFile = new File(filename);
+                            oldFile.delete();
+                        }
+                    }
+            }
+
 
             String host = extract.getAll(url)[0];
             String path = extract.getAll(url)[1];
@@ -24,48 +42,24 @@ public class main {
                 String newDate = mis.findLastModified("newheader.txt");
                 if (date.equals(newDate)) {
                     long oldSize = mis.getFileSize(fileName + "incomp" + fileType);
-                    int headerCount = mis.excludeHeader("newheader.txt");
-                    sk.resumableDownload(host, path, port, date, oldSize, filename, headerCount);
+                    sk.resumableDownload(host, path, port, date, oldSize, filename);
                 } else {
-                    System.err.println("File has been modified, start downloading anew!!");
-                    sk.downloadFile(host, path, port, filename);
+                    System.err.println("File has been modified, start downloading anew!!\n" + "Would you like to rewrite this file (y/n)");
+                    String answer = scanner.nextLine();
+                    if (answer.toLowerCase().equals("y")){
+                        sk.downloadFile(host, path, port, filename);
+                    } else {
+                        System.err.println("Terminate download, exiting!");
+                        File header = new File("newheader.txt");
+                        if (!header.delete()){
+                            System.out.println("failed");
+                        } else {
+                            System.out.println("succeed");
+                        }
+                    }
                 }
             } else {
-                //int contentLength = mis.getContentLength(url);
-                //int headerCount = mis.excludeHeader("header.txt");
-                //System.out.println(headerCount);
-                //long headerSize = mis.getFileSize("header.txt");
                 sk.downloadFile(host, path, port, filename);
             }
-        /*extractAll data = new extractAll();
-        socketConnect sk = new socketConnect();
-        Miscellanous mis = new Miscellanous();
-        String[] allData = data.getAll("https://pbs.twimg.com/profile_images/2370446440/6e2jwf7ztbr5t1yjq4c5.jpeg");
-        int port = data.getPort("https://pbs.twimg.com/profile_images/2370446440/6e2jwf7ztbr5t1yjq4c5.jpeg");
-        String date = mis.findLastModified("header.txt");
-        long size = mis.getContentLength("https://pbs.twimg.com/profile_images/2370446440/6e2jwf7ztbr5t1yjq4c5.jpeg");
-        long a = mis.getFileSize("outputincomp.txt");
-
-        //System.out.println(date);
-        //sk.resumableDownload(allData[0],allData[1],port,date,a,size,"output.txt");
-        sk.downloadFile(allData[0],allData[1],port, "output.txt",headerCount);
-        //sk.nonresumableDownload(allData[0],allData[1],port,"Fri, 10 Jan 2016 07:37:59 GMT","output.txt");
-        //sk.downloadHeader(allData[0],allData[1],port);
-
-        //System.out.println(mis.findLastModified("header.txt"));
-        //System.out.println(sk.getContentLength("http://www.mahidol.ac.th/en"));
-        try {
-            URL url = new URL("http://i.ytimg.com/vi/JNIxFZGqP-E/maxresdefault.jpg");
-            InputStream in = new BufferedInputStream(url.openStream());
-            OutputStream out = new BufferedOutputStream(new FileOutputStream("Image-Porkeri_001.jpg"));
-
-            for (int i; (i = in.read()) != -1; ) {
-                out.write(i);
-            }
-            in.close();
-            out.close();
-        }catch(IOException e){
-            e.printStackTrace();*/
-
     }
 }
